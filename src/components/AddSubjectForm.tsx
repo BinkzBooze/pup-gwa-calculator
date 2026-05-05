@@ -92,7 +92,7 @@ function AddSubjectFormInner({
         </Label>
         <Select
           defaultValue="1.0"
-          onValueChange={(v) => { gradeRef.current = v; }}
+          onValueChange={(v) => { if (v) gradeRef.current = v; }}
           disabled={isPending}
         >
           <SelectTrigger id={`grade-${termId}`} className="h-8 text-sm">
