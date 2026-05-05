@@ -1,0 +1,17 @@
+{
+  "skill_name": "pup-grading-logic-engine",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Calculate the GWA for these subjects: Math (3 units, grade 1.5), English (3 units, grade Inc), Science (4 units, grade 1.75).",
+      "expected_output": "The English subject should be entirely ignored. The GWA should be calculated as ((1.5 * 3) + (1.75 * 4)) / 7.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "A student has a cumulative GWA of 1.25. However, they received a 2.75 in their freshman year. What Latin Honor are they eligible for?",
+      "expected_output": "The student is automatically disqualified from Latin Honors because they have a grade lower than 2.5 (the 2.75).",
+      "files": []
+    }
+  ]
+}

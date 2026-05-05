@@ -1,0 +1,17 @@
+{
+  "skill_name": "nextjs-app-router-integrator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a page that fetches and displays the user's terms, and a form to add a new term.",
+      "expected_output": "A Next.js Server Component that fetches terms directly, plus a client component form that uses a Next.js Server Action to insert a new term, with proper @supabase/ssr auth checks.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Set up the Supabase SSR client for a Server Component to fetch the current session.",
+      "expected_output": "Correct usage of @supabase/ssr createServerClient to parse cookies and retrieve the auth session.",
+      "files": []
+    }
+  ]
+}

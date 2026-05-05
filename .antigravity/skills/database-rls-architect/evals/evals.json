@@ -1,0 +1,17 @@
+{
+  "skill_name": "database-rls-architect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate the Supabase schema for our GWA calculator app.",
+      "expected_output": "A valid PostgreSQL script creating profiles, terms, and subjects tables with RLS policies.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We need to set up tables to track subjects under terms for users, make sure the data is private.",
+      "expected_output": "A valid PostgreSQL script creating the three tables with RLS and ON DELETE CASCADE.",
+      "files": []
+    }
+  ]
+}
