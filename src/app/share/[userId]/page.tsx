@@ -10,7 +10,7 @@ import {
   evaluateLatinHonors,
 } from '@/lib/calculateGwa'
 import { GraduationCap, Lock } from 'lucide-react'
-import type { PageProps } from 'next/types'
+type PageProps<T> = { params: Promise<{ userId: string }> }
 
 export async function generateMetadata(
   props: PageProps<'/share/[userId]'>
