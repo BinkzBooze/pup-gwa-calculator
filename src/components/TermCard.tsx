@@ -19,13 +19,15 @@ function TermGwaBadge({ gwa }: { gwa: number | null }) {
 
   const formatted = gwa.toFixed(4)
   const color =
-    gwa <= 1.5
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-      : gwa <= 2.0
-      ? 'bg-sky-50 text-sky-700 border-sky-300'
-      : gwa <= 2.5
-      ? 'bg-violet-50 text-violet-700 border-violet-300'
-      : 'bg-orange-50 text-orange-700 border-orange-300'
+    gwa <= 1.15
+      ? 'bg-indigo-600 text-white border-indigo-700'
+      : gwa <= 1.35
+      ? 'bg-yellow-500 text-white border-yellow-600'
+      : gwa <= 1.5
+      ? 'bg-emerald-500 text-white border-emerald-600'
+      : gwa <= 3.0
+      ? 'bg-slate-100 text-slate-700 border-slate-300'
+      : 'bg-red-600 text-white border-red-700'
 
   return (
     <Badge variant="outline" className={`font-mono text-sm font-bold tabular-nums px-3 py-1 ${color}`}>

@@ -36,11 +36,8 @@ export default function DashboardNav({
             <GraduationCap className="h-5 w-5 text-[#FFD700]" />
           </div>
           <div className="flex flex-col leading-tight min-w-0">
-            <span className="text-sm font-bold tracking-wide text-white">
+            <span className="font-poppins text-sm font-extrabold uppercase tracking-tight text-white">
               BINKZ
-            </span>
-            <span className="hidden text-[10px] font-medium tracking-widest text-[#FFD700]/80 sm:block">
-              Polytechnic University of the Philippines GWA Calculator
             </span>
           </div>
         </div>

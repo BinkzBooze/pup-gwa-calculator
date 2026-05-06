@@ -17,9 +17,9 @@ interface GwaSummaryCardProps {
 }
 
 const HONOR_COLORS: Record<LatinHonor, string> = {
-  'Summa Cum Laude': 'bg-amber-50 text-amber-800 border-amber-300 ring-amber-200',
-  'Magna Cum Laude': 'bg-yellow-50 text-yellow-800 border-yellow-300 ring-yellow-200',
-  'Cum Laude': 'bg-lime-50 text-lime-800 border-lime-300 ring-lime-200',
+  'Summa Cum Laude': 'bg-indigo-600/20 text-indigo-700 border-indigo-300 ring-indigo-200',
+  'Magna Cum Laude': 'bg-yellow-500/20 text-yellow-700 border-yellow-300 ring-yellow-200',
+  'Cum Laude': 'bg-emerald-500/20 text-emerald-700 border-emerald-300 ring-emerald-200',
   'None': 'bg-muted text-muted-foreground border-border',
 };
 
@@ -33,12 +33,11 @@ const STANDING_COLORS: Record<AcademicStanding, string> = {
 
 const GWA_GRADIENT = (gwa: number | null): string => {
   if (gwa === null) return 'from-slate-400 to-slate-600';
-  if (gwa <= 1.15) return 'from-amber-400 to-yellow-500';
-  if (gwa <= 1.35) return 'from-yellow-400 to-amber-500';
-  if (gwa <= 1.6) return 'from-lime-400 to-green-500';
-  if (gwa <= 2.0) return 'from-sky-400 to-blue-500';
-  if (gwa <= 2.5) return 'from-violet-400 to-purple-500';
-  return 'from-slate-400 to-slate-600';
+  if (gwa <= 1.15) return 'from-indigo-600 to-violet-700'; // Summa
+  if (gwa <= 1.35) return 'from-yellow-400 to-amber-600'; // Magna
+  if (gwa <= 1.5) return 'from-emerald-400 to-teal-600';  // Cum Laude
+  if (gwa <= 3.0) return 'from-slate-500 to-slate-700';   // Passing
+  return 'from-red-500 to-red-700';                      // Failing
 };
 
 export default function GwaSummaryCard({
