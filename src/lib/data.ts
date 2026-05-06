@@ -35,6 +35,7 @@ export async function getTermsWithSubjects(): Promise<TermWithSubjects[]> {
   const { data: terms, error } = await supabase
     .from('terms')
     .select('*, subjects(*)')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) {

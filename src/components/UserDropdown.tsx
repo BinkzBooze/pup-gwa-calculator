@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, LogOut, Settings } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
 export default function UserDropdown({
@@ -19,6 +20,7 @@ export default function UserDropdown({
   displayName: string | null
   email: string | undefined
 }) {
+  const router = useRouter()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -77,6 +79,7 @@ export default function UserDropdown({
             onClick={() =>
               startTransition(async () => {
                 await signOut()
+                router.refresh()
               })
             }
           >

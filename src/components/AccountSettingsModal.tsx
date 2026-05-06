@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle2, Loader2, TriangleAlert } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useActionState, useState, useTransition } from 'react'
 
 /* ── Display name section ─────────────────────────────────── */
@@ -68,25 +69,52 @@ function DisplayNameForm({ currentName }: { currentName: string | null }) {
 
 
 /* ── Password section ─────────────────────────────────────── */
-type PwState = { error: string | null; success: boolean }
+type PwState = { error: string | null; success: boolean; timestamp?: number }
 const pwInit: PwState = { error: null, success: false }
 
 function PasswordForm() {
   async function action(_prev: PwState, formData: FormData): Promise<PwState> {
+    const current = formData.get('current') as string
     const pw = formData.get('password') as string
     const confirm = formData.get('confirm') as string
-    const result = await updatePassword(pw, confirm)
-    return { error: result.error, success: !result.error }
+
+    // Client-side validation
+    if (pw !== confirm) {
+      return { error: 'New passwords do not match.', success: false, timestamp: Date.now() }
+    }
+
+    const result = await updatePassword(current, pw, confirm)
+    return { 
+      error: result.error, 
+      success: !result.error,
+      timestamp: result.error ? Date.now() : _prev.timestamp 
+    }
   }
   const [state, formAction, isPending] = useActionState(action, pwInit)
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
+        <Label htmlFor="account-current-password" className="text-sm font-medium">
+          Current Password
+        </Label>
+        <Input
+          key={`current-${state.timestamp}`}
+          id="account-current-password"
+          name="current"
+          type="password"
+          placeholder="Required to change password"
+          required
+          disabled={isPending}
+          className="text-sm"
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
         <Label htmlFor="account-new-password" className="text-sm font-medium">
           New Password
         </Label>
         <Input
+          key={`new-${state.timestamp}`}
           id="account-new-password"
           name="password"
           type="password"
@@ -99,9 +127,10 @@ function PasswordForm() {
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="account-confirm-password" className="text-sm font-medium">
-          Confirm Password
+          Confirm New Password
         </Label>
         <Input
+          key={`confirm-${state.timestamp}`}
           id="account-confirm-password"
           name="confirm"
           type="password"
@@ -111,9 +140,13 @@ function PasswordForm() {
           className="text-sm"
         />
       </div>
-      {state.error && <p className="text-xs text-destructive">{state.error}</p>}
+      {state.error && (
+        <p className="flex items-center gap-1.5 text-xs text-destructive font-medium">
+          <TriangleAlert className="h-3.5 w-3.5" /> {state.error}
+        </p>
+      )}
       {state.success && (
-        <p className="flex items-center gap-1.5 text-xs text-emerald-600">
+        <p className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
           <CheckCircle2 className="h-3.5 w-3.5" /> Password updated successfully.
         </p>
       )}
@@ -135,6 +168,7 @@ function PasswordForm() {
 const CONFIRM_PHRASE = 'DELETE MY ACCOUNT'
 
 function DeleteAccountSection() {
+  const router = useRouter()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [typed, setTyped] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -154,6 +188,8 @@ function DeleteAccountSection() {
       const result = await deleteAccount()
       if (result?.error) {
         setError(result.error)
+      } else {
+        router.refresh()
       }
       // On success the Server Action calls redirect('/auth') automatically.
     })

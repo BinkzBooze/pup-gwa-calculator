@@ -55,7 +55,7 @@ export default async function DashboardPage() {
   const academicStanding = evaluateAcademicStanding(totalUnits, failedUnits)
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/30">
+    <div className="flex min-h-screen flex-col bg-muted/30 overflow-x-hidden">
       <DashboardNav
         displayName={profile.display_name}
         email={user.email}
@@ -66,8 +66,8 @@ export default async function DashboardPage() {
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
 
         {/* Top header row */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="flex flex-col">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               My Academic Record
             </h1>
@@ -75,7 +75,7 @@ export default async function DashboardPage() {
               {terms.length} semester{terms.length !== 1 ? 's' : ''} tracked
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <PublicProfileToggle isPublic={profile.is_public} />
             <ExportMenu terms={terms} profile={profile} cumulativeGwa={gwa} />
             <AddTermButton />

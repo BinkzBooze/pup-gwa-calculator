@@ -13,27 +13,68 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GraduationCap, Loader2 } from 'lucide-react'
-import { useActionState, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useActionState, useEffect, useState } from 'react'
 
-type FormState = { error: string | null }
+type FormState = {
+  error: string | null
+  fieldErrors?: Record<string, string>
+  email?: string
+  displayName?: string
+  timestamp?: number
+}
 const initialState: FormState = { error: null }
 
 function SignInForm({ onSwitch }: { onSwitch: () => void }) {
+  const router = useRouter()
   async function action(_prev: FormState, formData: FormData): Promise<FormState> {
     const email = (formData.get('email') as string)?.trim()
     const password = formData.get('password') as string
-    if (!email || !password) return { error: 'Email and password are required.' }
+    
+    const fieldErrors: Record<string, string> = {}
+    if (!email) fieldErrors.email = 'Email is required.'
+    if (!password) fieldErrors.password = 'Password is required.'
+    
+    if (Object.keys(fieldErrors).length > 0) {
+      return { error: null, fieldErrors, email, timestamp: Date.now() }
+    }
+
     const result = await signIn(email, password)
-    return result
+    
+    if (result?.error) {
+      return { 
+        error: result.error, 
+        email, 
+        timestamp: Date.now(),
+        fieldErrors: result.error.toLowerCase().includes('credential') || result.error.toLowerCase().includes('invalid')
+          ? { email: ' ', password: ' ' }
+          : undefined
+      }
+    }
+    
+    router.refresh()
+    return { error: null, timestamp: Date.now() }
   }
 
   const [state, formAction, isPending] = useActionState(action, initialState)
+  const [email, setEmail] = useState('')
+
+  useEffect(() => {
+    if (state.email !== undefined) {
+      setEmail(state.email)
+    }
+  }, [state.email, state.timestamp])
 
   return (
     <form action={formAction}>
       <CardContent className="grid gap-4 pt-4 pb-6">
         <div className="grid gap-2">
-          <Label htmlFor="signin-email">Email</Label>
+          <Label 
+            htmlFor="signin-email" 
+            className={state.fieldErrors?.email ? 'text-destructive' : ''}
+          >
+            Email
+          </Label>
           <Input
             id="signin-email"
             name="email"
@@ -41,20 +82,38 @@ function SignInForm({ onSwitch }: { onSwitch: () => void }) {
             placeholder="m@example.com"
             required
             disabled={isPending}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={state.fieldErrors?.email ? 'border-destructive focus-visible:ring-destructive' : ''}
           />
+          {state.fieldErrors?.email && state.fieldErrors.email !== ' ' && (
+            <p className="text-xs text-destructive">{state.fieldErrors.email}</p>
+          )}
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="signin-password">Password</Label>
+          <Label 
+            htmlFor="signin-password"
+            className={state.fieldErrors?.password ? 'text-destructive' : ''}
+          >
+            Password
+          </Label>
           <Input
+            key={`pw-${state.timestamp}`}
             id="signin-password"
             name="password"
             type="password"
             required
             disabled={isPending}
+            className={state.fieldErrors?.password ? 'border-destructive focus-visible:ring-destructive' : ''}
           />
+          {state.fieldErrors?.password && state.fieldErrors.password !== ' ' && (
+            <p className="text-xs text-destructive">{state.fieldErrors.password}</p>
+          )}
         </div>
         {state.error && (
-          <p className="text-sm text-destructive" role="alert">{state.error}</p>
+          <p className="text-sm font-medium text-destructive" role="alert">
+            {state.error}
+          </p>
         )}
       </CardContent>
       <CardFooter className="flex-col gap-3">
@@ -83,33 +142,86 @@ function SignInForm({ onSwitch }: { onSwitch: () => void }) {
 }
 
 function SignUpForm({ onSwitch }: { onSwitch: () => void }) {
+  const router = useRouter()
   async function action(_prev: FormState, formData: FormData): Promise<FormState> {
     const email = (formData.get('email') as string)?.trim()
     const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
     const displayName = (formData.get('displayName') as string)?.trim()
-    if (!email || !password) return { error: 'Email and password are required.' }
-    if (password.length < 6) return { error: 'Password must be at least 6 characters.' }
-    const result = await signUp(email, password, displayName)
-    return result
+    
+    const fieldErrors: Record<string, string> = {}
+    if (!email) fieldErrors.email = 'Email is required.'
+    if (!password) fieldErrors.password = 'Password is required.'
+    else if (password.length < 6) fieldErrors.password = 'Password must be at least 6 characters.'
+    
+    if (password && confirmPassword && password !== confirmPassword) {
+      fieldErrors.confirmPassword = 'Passwords do not match.'
+    } else if (password && !confirmPassword) {
+      fieldErrors.confirmPassword = 'Please confirm your password.'
+    }
+    
+    if (Object.keys(fieldErrors).length > 0) {
+      return { error: null, fieldErrors, email, displayName, timestamp: Date.now() }
+    }
+
+    const result = await signUp(email, password, displayName || '')
+    
+    if (result?.error) {
+      return { 
+        error: result.error, 
+        email, 
+        displayName, 
+        timestamp: Date.now(),
+        fieldErrors: result.error.toLowerCase().includes('email') 
+          ? { email: 'Email already in use or invalid.' } 
+          : undefined
+      }
+    }
+    
+    router.refresh()
+    return { error: null, timestamp: Date.now() }
   }
 
   const [state, formAction, isPending] = useActionState(action, initialState)
+  const [email, setEmail] = useState('')
+  const [displayName, setDisplayName] = useState('')
+
+  useEffect(() => {
+    if (state.email !== undefined) setEmail(state.email)
+    if (state.displayName !== undefined) setDisplayName(state.displayName)
+  }, [state.email, state.displayName, state.timestamp])
 
   return (
     <form action={formAction}>
       <CardContent className="grid gap-4 pt-4 pb-6">
         <div className="grid gap-2">
-          <Label htmlFor="signup-name">Display Name</Label>
+          <Label 
+            htmlFor="signup-name"
+            className={state.fieldErrors?.displayName ? 'text-destructive' : ''}
+          >
+            Display Name
+          </Label>
           <Input
             id="signup-name"
             name="displayName"
             type="text"
             placeholder="e.g. Juan dela Cruz"
             disabled={isPending}
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className={state.fieldErrors?.displayName ? 'border-destructive focus-visible:ring-destructive' : ''}
           />
+          {state.fieldErrors?.displayName && (
+            <p className="text-xs text-destructive">{state.fieldErrors.displayName}</p>
+          )}
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="signup-email">Email</Label>
+          <Label 
+            htmlFor="signup-email"
+            className={state.fieldErrors?.email ? 'text-destructive' : ''}
+          >
+            Email
+          </Label>
           <Input
             id="signup-email"
             name="email"
@@ -117,21 +229,60 @@ function SignUpForm({ onSwitch }: { onSwitch: () => void }) {
             placeholder="m@example.com"
             required
             disabled={isPending}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={state.fieldErrors?.email ? 'border-destructive focus-visible:ring-destructive' : ''}
           />
+          {state.fieldErrors?.email && (
+            <p className="text-xs text-destructive">{state.fieldErrors.email}</p>
+          )}
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="signup-password">Password</Label>
+          <Label 
+            htmlFor="signup-password"
+            className={state.fieldErrors?.password ? 'text-destructive' : ''}
+          >
+            Password
+          </Label>
           <Input
+            key={`pw-signup-${state.timestamp}`}
             id="signup-password"
             name="password"
             type="password"
             placeholder="Min. 6 characters"
             required
             disabled={isPending}
+            className={state.fieldErrors?.password ? 'border-destructive focus-visible:ring-destructive' : ''}
           />
+          {state.fieldErrors?.password && (
+            <p className="text-xs text-destructive">{state.fieldErrors.password}</p>
+          )}
+        </div>
+        <div className="grid gap-2">
+          <Label 
+            htmlFor="signup-confirm-password"
+            className={state.fieldErrors?.confirmPassword ? 'text-destructive' : ''}
+          >
+            Confirm Password
+          </Label>
+          <Input
+            key={`pw-confirm-${state.timestamp}`}
+            id="signup-confirm-password"
+            name="confirmPassword"
+            type="password"
+            placeholder="Repeat your password"
+            required
+            disabled={isPending}
+            className={state.fieldErrors?.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}
+          />
+          {state.fieldErrors?.confirmPassword && (
+            <p className="text-xs text-destructive">{state.fieldErrors.confirmPassword}</p>
+          )}
         </div>
         {state.error && (
-          <p className="text-sm text-destructive" role="alert">{state.error}</p>
+          <p className="text-sm font-medium text-destructive" role="alert">
+            {state.error}
+          </p>
         )}
       </CardContent>
       <CardFooter className="flex-col gap-3">

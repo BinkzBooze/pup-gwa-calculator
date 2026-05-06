@@ -46,7 +46,7 @@ export default function TermCard({
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="border-b border-border/50">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#800000]/10">
               <CalendarDays className="h-4 w-4 text-[#800000]" />
@@ -60,7 +60,7 @@ export default function TermCard({
               </p>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex items-center gap-2 sm:shrink-0 self-end sm:self-auto">
             <TermGwaBadge gwa={gwa} />
             {!readOnly && <DeleteTermButton termId={term.id} termTitle={term.title} />}
           </div>

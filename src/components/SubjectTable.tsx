@@ -70,7 +70,7 @@ export default function SubjectTable({
             </TableCell>
             {!readOnly && (
               <TableCell className="text-right pr-2">
-                <DeleteSubjectButton subjectId={subject.id} />
+                <DeleteSubjectButton subjectId={subject.id} subjectCode={subject.code} />
               </TableCell>
             )}
           </TableRow>

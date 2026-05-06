@@ -113,6 +113,7 @@ export async function updateDisplayName(
 }
 
 export async function updatePassword(
+  currentPassword: string,
   newPassword: string,
   confirmPassword: string
 ): Promise<{ error: string | null }> {
@@ -121,8 +122,19 @@ export async function updatePassword(
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated.' }
+  if (!user || !user.email) return { error: 'Not authenticated.' }
 
+  // Verify the current password by attempting a background sign-in.
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+
+  if (verifyError) {
+    return { error: 'Incorrect current password.' }
+  }
+
+  // If verification succeeds, update to the new password.
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) return { error: error.message }
 
