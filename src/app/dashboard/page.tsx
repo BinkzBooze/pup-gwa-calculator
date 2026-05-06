@@ -65,23 +65,27 @@ export default async function DashboardPage() {
 
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* Top header row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex flex-col">
-            <span className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">
+        {/* Top header area */}
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="space-y-0.5">
+            <span className="block text-[10px] font-medium uppercase tracking-widest text-muted-foreground/80 sm:text-xs">
               Polytechnic University of the Philippines GWA Calculator
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              My Academic Record
-            </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              {terms.length} semester{terms.length !== 1 ? 's' : ''} tracked
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <PublicProfileToggle isPublic={profile.is_public} />
-            <ExportMenu terms={terms} profile={profile} cumulativeGwa={gwa} />
-            <AddTermButton />
+            <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  My Academic Record
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {terms.length} semester{terms.length !== 1 ? 's' : ''} tracked
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                <PublicProfileToggle isPublic={profile.is_public} />
+                <ExportMenu terms={terms} profile={profile} cumulativeGwa={gwa} />
+                <AddTermButton />
+              </div>
+            </div>
           </div>
         </div>
 
